@@ -1,6 +1,6 @@
 # Git コマンドラインの使い方メモ
 
-##ローカル リポジトリに対する操作コマンド
+## ローカル リポジトリに対する操作コマンド
 状況表示
 ```
 git status
@@ -50,7 +50,7 @@ git log --follow [filename]
 git diff [コミットID 1] [コミットID 2] [filename]
 ```
 
-##リモート リポジトリに対する操作コマンド
+## リモート リポジトリに対する操作コマンド
 リモートリポジトリを、ローカルディスクにクローン
 ```
 git clone git@github.com:USER_NAME/REPOSITORY_NAME.git
@@ -63,9 +63,9 @@ git remote add origin git@github.com:USER_NAME/REPOSITORY_NAME.git
 ```
 git remote -v
 ```
-リモートリポジトリの変更をローカルに反映する
+リモートリポジトリの変更をローカルに反映する（デフォルトブランチ名がmainなのかmasterなのか注意すること）
 ```
-git pull origin master
+git pull origin main(master)
 ```
 または、ローカルにマージする前に変更内容を確認したい場合は、次の2段階のコマンドを使う
 ```
@@ -76,8 +76,8 @@ git merge origin/master
 ```
 git diff master origin/master
 ```
-ローカルリポジトリの変更をリモートに反映
+ローカルリポジトリの変更をリモートに反映る（デフォルトブランチ名がmainなのかmasterなのか注意すること）
 ```
-git push origin master
+git push origin main(master)
 ```
 
