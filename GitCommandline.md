@@ -61,7 +61,7 @@ git remote add origin git@github.com:USER_NAME/REPOSITORY_NAME.git
 ```
 リモートリポジトリと、ローカルリポジトリの紐づけ状況を画面表示する
 ```
-git remote
+git remote -v
 ```
 リモートリポジトリの変更をローカルに反映する
 ```
