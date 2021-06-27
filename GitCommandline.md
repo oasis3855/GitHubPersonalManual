@@ -45,9 +45,9 @@ git log [filename]
 ```
 git log --follow [filename]
 ```
-差分表示（特定のファイル名、ディレクトリを指定することもできる）
+差分表示（特定のコミットIDや、特定のファイル名、ディレクトリを指定することもできる）
 ```
-git diff [filename]
+git diff [コミットID 1] [コミットID 2] [filename]
 ```
 
 ##リモート リポジトリに対する操作コマンド
