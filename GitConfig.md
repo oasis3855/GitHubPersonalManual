@@ -1,5 +1,17 @@
 # Git環境設定
 
+## Linuxで公開鍵認証を用いる
+1. パブリック・キーをGitHubのWebサイトに登録する
+1. プライベート・キーをローカルマシンに登録する
+ 1. ``` /home/ユーザ/.ssh/config ``` ファイルを次のように作成する
+```
+Host github.com
+    User git
+    Hostname github.com
+    IdentityFile ~/.ssh_key/id_rsa_github
+```
+ 1. configのIdentityFile指定した先にプライベート・キーをコピーする
+
 ## Windowsでのgitconfig
 ``` .gitconfig ``` はユーザディレクトリ直下（``` C:\Users\ユーザ名\ ```）に作成する
 
