@@ -37,9 +37,15 @@ git reset --hard
 ```
 git reset --hard
 ```
-コミット ログの表示（特定のファイル名を指定することもできる）
+コミット ログの表示（特定のリモート名,ブランチ名,ファイル名などを指定することもできる）
 ```
-git log [filename]
+git log [リモート名] [リモート名/ブランチ名] [ブランチ名] [ファイル名]
+```
+コミット ログの表示をカスタマイズする。表示件数の指定（-n 5 または -5）、簡潔に1行表示（--oneline）、変更ファイル数や行数を簡潔に表示（--shortstat）、変更したファイル名のみ出力（--name-status）、コミットIDを短い形式で表示（--abbrev-commit）
+```
+git log -n 5
+git log -5
+git log --oneline --shortstat --name-status --abbrev-commit
 ```
 コミット ログの表示（特定のファイル名を指定し、ファイル名変更の追跡も行う）
 ```
@@ -68,18 +74,35 @@ git remote add origin git@github.com:USER_NAME/REPOSITORY_NAME.git
 ```
 git remote -v
 ```
-リモートリポジトリの変更をローカルに反映する（デフォルトブランチ名がmainなのかmasterなのか注意すること）
+リモートリポジトリ（origin）から指定したブランチ（main）を取得し反映する（デフォルトブランチ名がmainなのかmasterなのか注意すること）。  
+なお、下記例の[特定ブランチ名]を省略すればすべてのブランチが取得される。また、[リモート名]を省略すれば、デフォルトで設定されたリモートリポジトリ（デフォルトではorigin）に接続される。
 ```
-git pull origin main(master)
+git pull [リモート名] [特定ブランチ名]
+git pull origin main
+git pull origin master
 ```
-または、ローカルにマージする前に変更内容を確認したい場合は、次の2段階のコマンドを使う
+または、ローカルにマージする前に変更内容を確認したい場合は、次の2段階のコマンドを使う。  
+fetchの機能は  
+- リモートリポジトリ（origin）の特定ブランチ（main） → ローカルにある「リモートの変更点をキャッシュしている」ブランチ（origin/main）  
+
+mergeの機能は
+- ローカルのorigin/mainブランチ → ローカルのmainブランチ  
+
 ```
-git fetch origin
-git merge origin/master
+git fetch [リモート名] [特定ブランチ名]
+git fetch origin main
+ **** ここで差分確認等を行う（例 : git log origin --oneline , git diff --stat main origin/main）
+git merge origin/main
 ```
-※ローカル都の差分を確認する
+リモートリポジトリoriginのコミットログを10件前まで（-n 10）、簡潔に1行表示（--oneline）で表示する
 ```
-git diff master origin/master
+git log origin -n 10 --oneline
+```
+ローカルリポジトリのmainブランチと、リモートリポジトリoriginのmainブランチの差分を確認する。--statオプションを付けると、変更したファイル名と変更割合のバーグラフを表示。 --name-statusオプションは、変更したファイル名のみを表示する。
+```
+git diff main origin/main
+git diff --stat main origin/main
+git diff --name-status main origin/main
 ```
 ローカルリポジトリの変更をリモートに反映る（デフォルトブランチ名がmainなのかmasterなのか注意すること）
 ```
