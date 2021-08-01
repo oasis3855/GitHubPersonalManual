@@ -44,6 +44,11 @@ git diff HEAD^         ← 最新（最後）のコミットでの変更点を�
 ```
 git diff --stat [コミットID 1] [コミットID 2]
 ```
+特定のコミットIDのときまで巻き戻して、ファイルを表示する（
+```
+git show [コミットID]:[ファイル名]
+git show [コミットID]:[ファイル名] | gedit -
+```
 
 ### 過去のコミット時点に戻すresetの方法
 コミットを取り消す（commit のみを取り消す）。[コミットID]を指定して戻ることや、`HEAD^`を指定して、1回前のコミット時点まで戻る（`HEAD^1`と`HEAD`は同じ。また2回前は`HEAD^2`と記述。`HEAD^^`や`HEAD~{2}`という記述方法もある）。ブランチが指し示すHAEDが移動するだけなので、変更されたファイルは現状のまま
@@ -118,6 +123,11 @@ git fetch [リモート名] [特定ブランチ名]
 git fetch origin main
  **** ここで差分確認等を行う（例 : git log origin --oneline , git diff --stat main origin/main）
 git merge origin/main
+```
+mergeでエラーが出た場合（error: Your local changes to the following files would be overwritten by merge）で、強制mergeしてリモートの内容で全て上書きしたい時
+```
+git fetch origin main
+git reset --hard origin/main
 ```
 リモートリポジトリoriginのコミットログを10件前まで（-n 10）、簡潔に1行表示（--oneline）で表示する
 ```
