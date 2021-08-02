@@ -2,18 +2,17 @@
 
 ## 基本的な環境設定
 ### .gitconfig
+システム設定のための `.gitconfig` ファイルは次の場所に作成される
+- Linuxの場合 : `/etc/gitconfig`
+- Windowsの場合 : `C:\Program Files\Git\etc\gitconfig`
 グローバル設定のための `.gitconfig` ファイルはユーザディレクトリ直下に作成する
 - Linuxの場合 : `/home/ユーザ/.gitconfig`
 - Windowsの場合 : `C:\Users\ユーザ\.gitconfig`
 
 ### 状態表示
-グローバル設定の表示
+設定一覧の表示。`--system`（システム設定）, `--global`（グローバル設定）, `--local`（リポジトリ個別設定）のそれぞれ限定して表示することもできる。`--show-origin`を指定すると、それぞれの設定値を格納しているgitconfigファイルのフルパス名が併記される
 ```
-git config --global -l
-```
-現在のリポジトリの表示（設定ファイルは ` プロジェクトディレクトリ/.git/config `）
-```
-git config --local -l
+git config [--system|--global|--local] --list|-l [--show-origin]
 ```
 現在のリポジトリのリモート接続状態のみを表示
 ```
