@@ -21,20 +21,62 @@ git add -A
 ```
 git commit [-m "コミット メッセージ 文字列"]
 ```
+***
 コミット ログの表示（特定のリモート名,ブランチ名,ファイル名などを指定することもできる）
 ```
 git log [リモート名] [リモート名/ブランチ名] [ブランチ名] [ファイル名]
 ```
-コミット ログの表示をカスタマイズする。表示件数の指定（-n 5 または -5）、簡潔に1行表示（--oneline）、変更ファイル数や行数を簡潔に表示（--shortstat）、変更したファイル名のみ出力（--name-status）、コミットIDを短い形式で表示（--abbrev-commit）
+コミット ログの表示をカスタマイズする
 ```
 git log -n 5
 git log -5
 git log --oneline --shortstat --name-status --abbrev-commit
 ```
+コミット ログの表示をformatでカスタマイズする
+```
+git log --pretty=format:'%h %ai %C(red)%s'
+```
 コミット ログの表示（特定のファイル名を指定し、ファイル名変更の追跡も行う）
 ```
 git log --follow [filename]
 ```
+git log の主なオプション（[manページ](https://git-scm.com/book/ja/v2/Git-%E3%81%AE%E5%9F%BA%E6%9C%AC-%E3%82%B3%E3%83%9F%E3%83%83%E3%83%88%E5%B1%A5%E6%AD%B4%E3%81%AE%E9%96%B2%E8%A6%A7)）
+
+| 引数 | 説明 |
+| --- | --- |
+| --oneline | 各コミットを一行で出力（--pretty=oneline とほぼ同じ） |
+| --stat | 各コミットで変更されたファイルの統計情報を表示する |
+| --shortstat | --stat コマンドのうち、変更/追加/削除 の行だけを表示する |
+| --name-status | 変更されたファイルと 追加/修正/削除 情報を表示する |
+| --abbrev-commit | コミットのハッシュを短く表示する |
+| --graph | ブランチやマージを分かりやすくアスキー・グラフで表示 |
+| --pretty=format:'...' | 別のフォーマットで表示する |
+| -n 数値 , -数値 | 表示するコミットの個数を指定（--max-count=数値 も同じ意味） |
+| --since=日付 | 指定した日以降のコミットに限定（--since=2021/8/16） |
+| --before=日付 | 指定した日以前のコミットに限定 |
+| --merges | マージした時のコミットを表示 |
+| --first-parent | 最初に親となったコミットを表示する（マージコミットのマージ元を除外する） |
+
+
+--pretty=format:'...' の主なオプション
+
+| 引数 | 説明 |
+| --- | --- |
+| %H | コミットのハッシュ値（40文字） |
+| %h | コミットのハッシュ値（短い形式） |
+| %P | 親コミットのハッシュ値（40文字） |
+| %p | 親コミットのハッシュ値（短い形式） |
+| %ai | addの日時 |
+| %ad | addの日時（--date=format:'%Y/%m/%d %H:%M:%S' の書式を用いる） |
+| %an | addしたユーザの名前 |
+| %ci | コミットした日時 |
+| %cd | コミットの日時（--date=format:'%Y/%m/%d %H:%M:%S' の書式を用いる） |
+| %cn | コミットしたユーザの名前 |
+| %s | コミット時のメッセージ文字列 |
+| %C(...) | 文字列の着色開始（red, green, cyan, yellow 等を指定） |
+| %Creset | 文字列の着色終了 |
+
+***
 差分表示（特定のコミットIDや、特定のファイル名、ディレクトリを指定することもできる）
 ```
 git diff [コミットID 1] [コミットID 2] [filename]
@@ -143,9 +185,13 @@ git diff --name-status main origin/main
 ```
 git push origin main
 ```
+コミットしているが、プッシュしていないものがないか確認する
+```
+git log origin/main..main
+```
 git pushを取り消す（直前のコミットを取り消し、強制pushを行う）
 ```
 git reset --hard HEAD^
-git push -f origin master
+git push -f origin main
 ```
 
