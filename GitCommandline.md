@@ -65,7 +65,7 @@ git log --oneline --shortstat --name-status --abbrev-commit
 ```
 コミット ログの表示をformatでカスタマイズする
 ```
-git log --pretty=format:'%h %ai %C(red)%s'
+git log --pretty=format:'%C(yellow)%h%Creset %C(green)%cd%Creset %s %C(red)%d%Creset' --date=format:'%Y/%m/%d %H:%M' --graph
 ```
 コミット ログの表示（特定のファイル名を指定し、ファイル名変更の追跡も行う）
 ```
@@ -89,7 +89,7 @@ git log の主なオプション（[manページ](https://git-scm.com/book/ja/v2
 | --first-parent | 最初に親となったコミットを表示する（マージコミットのマージ元を除外する） |
 
 
---pretty=format:'...' の主なオプション
+--pretty=format:'...' の主なオプション（[manページ](https://git-scm.com/docs/pretty-formats)）
 
 | 引数 | 説明 |
 | --- | --- |
