@@ -55,3 +55,20 @@ git branch -D ブランチ名
 git checkout ブランチ名
 git push origin HEAD
 ```
+
+# リモート リポジトリに対する操作コマンド
+リモートのブランチ一覧を表示。` -r `オプションはリモートのみを表示対象。 ` -a `オプションはローカルとリモートの双方を対象
+```
+git branch -r
+git branch -a
+```
+`git clone`はmainブランチだけをクローンするが、それ以外のブランチを更にクローンする。` git checkout --track origin/ブランチ名 ` は ` git checkout -b ブランチ名 origin/ブランチ名 ` の短縮形
+```
+git clone git@github.com:USER_NAME/REPOSITORY_NAME.git
+git checkout --track origin/ブランチ名
+```
+リモートのブランチを削除する
+```
+git push origin --delete ブランチ名
+```
+
