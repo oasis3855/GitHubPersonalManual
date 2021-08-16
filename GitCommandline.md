@@ -220,7 +220,6 @@ git remote show -n origin
 ```
 git pull [リモート名] [特定ブランチ名]
 git pull origin main
-git pull origin master
 ```
 または、ローカルにマージする前に変更内容を確認したい場合は、次の2段階のコマンドを使う。  
 fetchの機能は  
