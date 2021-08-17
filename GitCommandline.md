@@ -75,7 +75,7 @@ git log の主なオプション（[manページ](https://git-scm.com/book/ja/v2
 
 | 引数 | 説明 |
 | --- | --- |
-| --oneline | 各コミットを一行で出力（--pretty=oneline とほぼ同じ） |
+| --oneline | 各コミットを一行で出力（--pretty=oneline --abbrev-commit と同じ） |
 | --stat | 各コミットで変更されたファイルの統計情報を表示する |
 | --shortstat | --stat コマンドのうち、変更/追加/削除 の行だけを表示する |
 | --name-status | 変更されたファイルと 追加/修正/削除 情報を表示する |
@@ -87,11 +87,13 @@ git log の主なオプション（[manページ](https://git-scm.com/book/ja/v2
 | --before=日付 | 指定した日以前のコミットに限定 |
 | --merges | マージした時のコミットを表示 |
 | --first-parent | 最初に親となったコミットを表示する（マージコミットのマージ元を除外する） |
+| --all, --branches | 全てのブランチを表示 |
+| --graph | ブランチ ツリーをASCII文字線で表現する |
 
 
 --pretty=format:'...' の主なオプション（[manページ](https://git-scm.com/docs/pretty-formats)）
 
-| 引数 | 説明 |
+| プレースホルダー | 説明 |
 | --- | --- |
 | %H | コミットのハッシュ値（40文字） |
 | %h | コミットのハッシュ値（短い形式） |
