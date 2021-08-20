@@ -15,6 +15,7 @@ git branch 新ブランチ名
 ブランチの名前を変更する
 ```
 git branch -m 変更前ブランチ名 変更後ブランチ名
+git branch --move 変更前ブランチ名 変更後ブランチ名
 ```
 
 ブランチの切り替え。切り替えを行うと、HEADがこのブランチを指し示すようになる
@@ -62,10 +63,17 @@ git clone git@github.com:USER_NAME/REPOSITORY_NAME.git
 cd REPOSITORY_NAME
 git checkout --track origin/ブランチ名
 ```
+すでにローカルにダウンロード済みのリポジトリが最新かどうかチェックし、最新でなければリモートからダウンロードしてマージする一連の処理
+```
+git checkout ブランチ名
+git fetch [origin ブランチ名]
+git log [origin] --oneline --all --graph      ← ログ確認などを行う
+git merge origin/ブランチ名
+```
 指定したブランチをリモートにプッシュする。プッシュ先のブランチ名は` HEAD `または` 現在のブランチ名 `のどちらでもよい
 ```
 git checkout ブランチ名
-git push origin HEAD
+git push [origin HEAD]
 ```
 リモートのブランチを削除する
 ```
