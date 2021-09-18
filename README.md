@@ -7,4 +7,4 @@
 - [リポジトリの部分抽出・結合の作業例](GitExampleSplitMerge.md)
 
 ## その他
-
+- [GitHubを使うためのメモ](GithubManual.md)
