@@ -1,7 +1,7 @@
 # Git環境設定
 
-## 基本的な環境設定
-### .gitconfig
+## 設定ファイル(.gitconfig)の作成
+### .gitconfigの格納場所
 システム設定のための `.gitconfig` ファイルは次の場所に作成される
 - Linuxの場合 : `/etc/gitconfig`
 - Windowsの場合 : `C:\Program Files\Git\etc\gitconfig`
@@ -18,28 +18,56 @@ git config [--system|--global|--local] --list|-l [--show-origin]
 ```
 git remote -v
 ```
-## Linuxで公開鍵認証を用いる
+
+### .gitconfigの例
+`/home/ユーザ/.gitconfig`の例。それぞれのセクションの設定については、[Git のカスタマイズ - Git の設定](https://git-scm.com/book/ja/v2/Git-%E3%81%AE%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%9E%E3%82%A4%E3%82%BA-Git-%E3%81%AE%E8%A8%AD%E5%AE%9A) (Git公式マニュアル)を参照
+```
+[core]
+    pager = less
+    # 対話形エディター（commitメッセージの編集 等）
+    editor = vim
+    # utf8以外をクオートしないよう設定
+    #（ShiftJISのファイル名をコマンドラインに表示できるようにする）
+    quotepath = false
+[user]
+    name = [logに表示するユーザ名]
+    email = [メールアドレス@users.noreply.github.com]
+[code]
+    # Visual Studio Code
+    editor = code --wait
+[merge]
+    # Visual Studio Code
+    tool = code --wait \"$MERGED\"
+[diff]
+    tool = meld
+[difftool "meld"]
+    cmd = meld "$LOCAL" "$REMOTE"
+[alias]
+    meld = difftool -y -d -t meld
+    guidiff = difftool -y -d -t meld
+    log1 = log --pretty=format:'%C(yellow)%h%Creset %C(green)%cd%Creset %s %C(red)%d%Creset' --date=format:'%Y/%m/%d %H:%M' --graph --all
+```
+
+
+## 公開鍵認証を用いる
 ### 環境設定
-1. パブリック・キーをGitHubのWebサイトに登録する
-1. プライベート・キーをローカルマシンに登録する
-    1. ` /home/ユーザ/.ssh/config ` ファイルを次のように作成する  
-```bash
+- パブリック・キーをGitHubのWebサイトに登録する
+- プライベート・キーをローカルマシンに登録する
+
+ ` /home/ユーザ/.ssh/config ` ファイルを次のように作成し、そこで指定したディレクトリにプライベート・キー（ここでの例：id_rsa_github）を格納する
+```
 Host github.com
         Hostname github.com
         User git
         IdentityFile ~/.ssh_key/id_rsa_github
 ```
-    1. configのIdentityFile指定した先にプライベート・キーをコピーする  
-この例では、`~/.ssh_key` というディレクトリを作成し、その中に秘密鍵ファイル `id_rsa_github` をコピーする
-1. 接続テスト
+- 接続テスト
 
-```bash
-ssh -T github.com
-    Enter passphrase for key '/home/ユーザ名/.ssh_key/id_rsa_github':   
-    Hi [GitHubユーザ名]! You've successfully authenticated, but GitHub does not provide shell access.
 ```
-
-### 利用
+ssh -T github.com
+>    Enter passphrase for key '/home/ユーザ名/.ssh_key/id_rsa_github':   
+>    Hi [GitHubユーザ名]! You've successfully authenticated, but GitHub does not provide shell access.
+```
 
 
 ## git diffでGUIツールを利用する
