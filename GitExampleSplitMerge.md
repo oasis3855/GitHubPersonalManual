@@ -1,9 +1,11 @@
 # リポジトリの部分抽出・結合の作業例
+
 - [リポジトリの部分抽出・結合の作業例](#リポジトリの部分抽出結合の作業例)
   - [リポジトリの一部分を抽出](#リポジトリの一部分を抽出)
     - [（１）特定ディレクトリのみを残す](#１特定ディレクトリのみを残す)
     - [（２）指定したファイルやディレクトリを削除する](#２指定したファイルやディレクトリを削除する)
   - [2つのリポジトリを1つに結合した新しいリポジトリを作成する](#2つのリポジトリを1つに結合した新しいリポジトリを作成する)
+  - [2つのローカル リポジトリを結合する](#2つのローカル-リポジトリを結合する)
 
 ## リポジトリの一部分を抽出
 ### （１）特定ディレクトリのみを残す
@@ -150,6 +152,8 @@ test01$ git log --oneline --stat
 >  test01_subdir/test01_hello.pl | 7 +++++++
 >  1 file changed, 7 insertions(+)
  ```
+
+---
 
 ## 2つのリポジトリを1つに結合した新しいリポジトリを作成する
 
@@ -397,3 +401,66 @@ test$ git branch -a
 > * main
 ```
 
+---
+
+## 2つのローカル リポジトリを結合する
+
+ローカルディスク内に、次のようにリポジトリが2つあるとする。
+```
+[dir]
+  |
+  +-- [repo_1]
+  |     +- file_1.txt
+  |
+  +-- [repo_2]
+        +- file_2.txt
+```
+repo_1 リポジトリに、repo_2 リポジトリの内容を取り込んでマージする方法。まず、repo_1 ディレクトリに入る
+
+```
+$ cd repo_1
+``` 
+次に、repo_1にrepo_2をリモート接続、取り込みを行う
+```
+repo_1$ git remote add remote_repo_2 ../repo_2
+repo_1$ git fetch remote_repo_2
+> warning: no common commits
+> remote: Counting objects: 20, done.
+> remote: Compressing objects: 100% (13/13), done.
+> remote: Total 20 (delta 7), reused 0 (delta 0)
+> Unpacking objects: 100% (20/20), done.
+> From ../repo_2
+>  * [new branch]      master     -> repo_jpeg2pdf/master
+```
+ブランチ一覧を表示
+```
+repo_1$ git branch -a
+> * master
+>   remotes/remote_repo_2/master
+repo_1$ git remote -v
+> remote_repo_2	../repo_2 (fetch)
+> remote_repo_2	../repo_2 (push)
+```
+単純にマージするとエラーが出る
+```
+repo_1$ git merge remote_repo_2/master
+> fatal: refusing to merge unrelated histories
+```
+強制的にマージを行う
+```
+repo_1$ git merge --allow-unrelated-histories remote_repo_2/master
+> Merge made by the 'recursive' strategy.
+>  file_2.txt | 324 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 324 insertions(+)
+>  create mode 100644 file_2.txt
+```
+不要となった（リモートからコピーするために使った）ブランチを削除する
+```
+repo_1$ git branch --no-merged
+>    ← マージされていないブランチは存在しない（この行には何も表示されない）
+repo_1$ git branch -r -d remote_repo_2/master
+```
+リモート接続設定も削除する
+```
+repo_1$ git remote remove remote_repo_2
+```
