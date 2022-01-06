@@ -82,7 +82,7 @@ git log --oneline --shortstat --name-status --abbrev-commit
 ```
 git log --pretty=format:'%C(yellow)%h%Creset %C(green)%cd%Creset %s %C(red)%d%Creset' --date=format:'%Y/%m/%d %H:%M' --graph
 ```
-コミット ログの表示（特定のファイル名を指定し、ファイル名変更の追跡も行う）
+コミット ログの表示（特定のファイル名を指定し、ファイル名変更・ディレクトリ移動の追跡も行う）
 ```
 git log --follow [filename]
 ```
@@ -223,9 +223,17 @@ git stash pop [stash@{n}]
 ```
 git clone git@github.com:USER_NAME/REPOSITORY_NAME.git
 ```
-リモートリポジトリと、ローカルリポジトリの紐づけ
+ローカルリポジトリ（別のリポジトリ OTHER_REPO_DIR）を、ローカルディスクにクローン（新リポジトリ名 NEW_REPO_DIR）
+```
+git clone OTHER_REPO_DIR NEW_REPO_DIR
+```
+リモートリポジトリと、ローカルリポジトリの紐づけ。（リモートの名称はoriginとする）
 ```
 git remote add origin git@github.com:USER_NAME/REPOSITORY_NAME.git
+```
+ローカルリポジトリ（別のリポジトリ ../OTHER_REPO_DIR）を、ローカルリポジトリに紐付け（紐付けられた別のリポジトリの名称はext_repoとする
+```
+git remote add ext_repo ../OTHER_REPO_DIR
 ```
 リモートリポジトリと、ローカルリポジトリの紐づけ状況を画面表示する
 ```
