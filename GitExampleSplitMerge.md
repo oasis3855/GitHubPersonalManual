@@ -6,6 +6,8 @@
     - [（２）指定したファイルやディレクトリを削除する](#２指定したファイルやディレクトリを削除する)
   - [2つのリポジトリを1つに結合した新しいリポジトリを作成する](#2つのリポジトリを1つに結合した新しいリポジトリを作成する)
   - [2つのローカル リポジトリを結合する](#2つのローカル-リポジトリを結合する)
+  - [別のリポジトリを、指定のディレクトリ下に結合する](#別のリポジトリを指定のディレクトリ下に結合する)
+  - [ファイルの履歴を追跡できる形で、別のリポジトリを指定ディレクトリ以下にコピーする](#ファイルの履歴を追跡できる形で別のリポジトリを指定ディレクトリ以下にコピーする)
 
 ## リポジトリの一部分を抽出
 ### （１）特定ディレクトリのみを残す
@@ -415,7 +417,18 @@ test$ git branch -a
   +-- [repo_2]
         +- file_2.txt
 ```
-repo_1 リポジトリに、repo_2 リポジトリの内容を取り込んでマージする方法。まず、repo_1 ディレクトリに入る
+repo_1 リポジトリに、repo_2 リポジトリの内容を取り込んでマージして、次のような形にする。
+```
+[dir]
+  |
+  +-- [repo_1]
+        +- file_1.txt
+        +- file_2.txt
+```
+---
+作業手順
+
+まず、repo_1 ディレクトリに入る
 
 ```
 $ cd repo_1
@@ -463,4 +476,316 @@ repo_1$ git branch -r -d remote_repo_2/master
 リモート接続設定も削除する
 ```
 repo_1$ git remote remove remote_repo_2
+```
+
+
+---
+## 別のリポジトリを、指定のディレクトリ下に結合する
+
+ローカルディスク内に、既存のリポジトリ repo_1 と、新しく作成するリポジトリ repo_all があるとする。
+```
+[dir]
+  |
+  +-- [repo_1]
+  |     +- file_1.txt
+  |
+  +-- [repo_all]  … 新規作成
+```
+この repo_1 を repo_all 内のサブディレクトリに取り込む。取り込み後のは次のようになる。
+```
+[dir]
+  |
+  +-- [repo_1]
+  |     +- file_1.txt
+  |
+  +-- [repo_all]
+        +- dir_1
+             +- file_1.txt
+```
+```git subtree``` または ```git read-tree``` コマンドを用いてディレクトリを新規作成しつつ取り込むことが出来る。
+
+ただし、 ファイルごとの履歴は ```git log --follow [filename]``` と明示的に追跡を指定（--follow）しても追跡することは出来ない。
+
+---
+作業手順
+
+repo_all を新規作成し、repo_1をリモートで接続する
+
+```
+$ mkdir repo_all
+
+$ cd repo_all
+
+repo_all$ git init
+> Initialized empty Git repository in /home/user/repo_all/.git/
+
+repo_all$ git remote add rem_repo_1 ../repo_1/
+
+repo_all$ git remote -v
+> rem_repo_1	../repo_1/ (fetch)
+> rem_repo_1	../repo_1/ (push)
+```
+
+リモートの内容を取り込む
+```
+repo_all$ git fetch --all
+> Fetching rem_repo_1
+> remote: Counting objects: 6, done.
+> remote: Compressing objects: 100% (2/2), done.
+> remote: Total 6 (delta 0), reused 0 (delta 0)
+> Unpacking objects: 100% (6/6), done.
+> From ../repo_1
+> * [new branch]      master     -> rem_repo_1/master
+```
+
+この時点では、まだファイルは同期されていない（ディレクトリ内にファイルは何もない）
+```
+repo_all$ ls -a
+> ./  ../  .git/
+```
+
+```git subtree```コマンドで、内部ディレクトリ ```dir_1``` にリモートの内容を取り込む命令を出すが、この時点ではエラーとなる
+```
+repo_all$ git subtree add --prefix=dir_1 rem_repo_1 main
+> fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+> Use '--' to separate paths from revisions, like this:
+> 'git <command> [<revision>...] -- [<file>...]'
+>Working tree has modifications.  Cannot add.
+```
+
+エラーの原因は、repo_allリポジトリに何も入っていない、1回もコミットが行われていないから。空のコミット（```git commit --allow-empty -m "msg"```）でもよいが、今回は適当なファイル（```.gitignore```）を作成しコミットする
+```
+repo_all$ echo -e "*.bak\n" > .gitignore 
+
+repo_all$ git add .gitignore
+
+repo_all$ git commit -m "add .gitignore, first commit"
+> [master (root-commit) 51beb67] add .gitignore, first commit for exec subtree
+> 1 file changed, 2 insertions(+)
+> create mode 100644 .gitignore
+```
+
+その後、```git subtree```コマンドを実行すると成功する
+```
+repo_all$ git subtree add --prefix=dir_1 rem_repo_1 main
+> git fetch rem_repo_1 main
+> From ../repo_1
+> * branch            main       -> FETCH_HEAD
+>Added dir 'dir_1'
+```
+
+```git --subtree```ではなく、次のように```git read-tree```コマンドを用いることもできる
+```
+repo_all$ git read-tree --prefix=dir_1 -u rem_repo_1/main
+```
+
+ディレクトリ内に、リモートのファイルが反映される
+```
+repo_all$ ls -a
+> ./  ../  .git/  .gitignore  dir_1/
+
+repo_all$ ls -a dir_1/
+> ./  ../  file_1.txt
+```
+
+---
+## ファイルの履歴を追跡できる形で、別のリポジトリを指定ディレクトリ以下にコピーする
+
+```git log```によるファイル追跡は、ファイルを別ディレクトリに移動・改名（```git mv```）すれば、```git log --follow```と明示的に追跡を指定しても、追跡することは出来ない。
+
+今回取り上げるのは、ファイルを別ディレクトリに移動（```git mv file dir/```相当の処理）を行っても、追跡できるようにするトリックである。
+
+```
+[dir]
+  |
+  +-- [repo_1]
+  |     +- file01.txt
+  |
+  +-- [repo_all]  … 既存のリポジトリ
+```
+この repo_1 を repo_all 内のサブディレクトリに取り込む。取り込み後のは次のようになる。
+```
+[dir]
+  |
+  +-- [repo_1]
+  |     +- file_1.txt
+  |
+  +-- [repo_all]
+        +- dir_1  … 新ディレクトリ内に repo_1の内容をコピー
+             +- file_1.txt
+```
+
+---
+***作業手順 第1段階（作業用リポジトリにコピーする）***
+
+まず、repo_1の破壊を避けるため、作業用のリポジトリrepo_tempを新たに作成し、そこでdir_1内に全てのファイルを移動する。移動後は次のような形になる
+```
+[dir]
+  |
+  +-- [repo_1]
+  |     +- file_1.txt
+  |
+  +-- [repo_temp]  … 作業用に一時リポジトリを作成する
+        +- dir_1  … 新ディレクトリ内に repo_1の内容をコピー
+             +- file_1.txt
+```
+
+repo_tempを作成
+```
+$ mkdir repo_temp && cd $_
+
+repo_temp$ git init
+> Initialized empty Git repository in /home/user/repo_temp/.git/
+```
+リモートリポジトリを関連付け、ファイルを取り込む
+```
+repo_temp$ git remote add rem_repo_1 ../repo_1/
+
+repo_temp$ git fetch --all
+> Fetching rem_repo_1
+> remote: Counting objects: 9, done.
+> remote: Compressing objects: 100% (5/5), done.
+> remote: Total 9 (delta 0), reused 0 (delta 0)
+> Unpacking objects: 100% (9/9), done.
+> From ../repo_1
+> * [new branch]      main       -> rem_repo_1/main
+
+repo_temp$ git merge --allow-unrelated-histories rem_repo_1/main
+```
+リモートの関連付けを削除する
+```
+repo_temp$ git remote remove rem_repo_1 
+```
+この時点での状態を確認
+```
+repo_temp$  git ls-files -s
+> .gitignore
+> file01.txt
+
+repo_temp$ git branch -a
+> * master
+
+repo_temp$ git remote -v
+```
+ファイルの履歴も、ディレクトリ移動前なので当然ながら追跡できる
+```
+repo_temp$ git log --oneline
+> 1f64e94 (HEAD -> master) 2nd edit file01.txt (repo_1)
+> 2849c01 new file01.txt (repo_1)
+> 4cd1f1a first commit (repo_1)
+
+repo_temp$ git log --oneline file01.txt
+> 1f64e94 (HEAD -> master) 2nd edit file01.txt (repo_1)
+> 2849c01 new file01.txt (repo_1)
+```
+
+---
+***作業手順 第2段階（作業用リポジトリ内でファイルをディレクトリに移動）***
+
+```git filter-branch --index-filter```を使って、履歴追跡を維持したまま、ファイルを全て新ディレクトリ（dir_1）に移動する。
+
+```
+repo_temp$ git filter-branch --index-filter 'git ls-files -s | sed "s@\t\"*@&dir_1/@" | \
+  GIT_INDEX_FILE=$GIT_INDEX_FILE.new git update-index --index-info &&
+  mv $GIT_INDEX_FILE.new $GIT_INDEX_FILE || true' HEAD
+
+> Rewrite 4cd1f1ab137d7fa8fc45aa9eea38f998b817487e (1/3) (0 seconds passed, remaining 0 predicted)    mv: '/home/user/repo_temp/.git-rewrite/t/../index.new' を stat できません: そのようなファイルやディレクトリはありません
+> Rewrite 2849c014ebe065837046a170f92270a770e46f99 (2/3) (0 seconds passed, remainRewrite 1f64e94f8ea1067b54c145aa6b227ee7ff16b484 (3/3) (0 seconds passed, remaining 0 predicted)    
+> Ref 'refs/heads/master' was rewritten
+```
+ファイルの状況と、ログが追跡できているか確認する
+```
+repo_temp$ git ls-files
+> dir_1/.gitignore
+> dir_1/file01.txt
+
+repo_temp$ git log --oneline
+> f409b56 (HEAD -> master) 2nd edit file01.txt (repo_1)
+> 6514ca3 new file01.txt (repo_1)
+> 4cd1f1a first commit (repo_1)
+
+repo_temp$ git log --oneline dir_1/file01.txt
+> f409b56 (HEAD -> master) 2nd edit file01.txt (repo_1)
+> 6514ca3 new file01.txt (repo_1)
+```
+
+---
+***作業手順 第3段階（作業用リポジトリから目的リポジトリにコピー）***
+
+第2段階で作成したリポジトリを、既存のrepo_allリポジトリに取り込む。最初に、repo_allの状態を表示してみる。.gitignore というファイルが1つある状態だ
+
+```
+repo_temp$ cd ../repo_all/
+
+repo_all$ git ls-files
+> .gitignore
+
+/repo_all$ git log --oneline
+> 95e44eb (HEAD -> master) first commit, add .gitignore (repo_all)
+```
+
+リモート リポジトリとして、第1〜第2段階で作成した作業用リポジトリを登録し、取り込む
+
+```
+repo_all$ git remote add rem_repo_temp ../repo_temp/
+
+repo_all$ git fetch --all
+> Fetching rem_repo_temp
+> warning: no common commits
+> remote: Counting objects: 11, done.
+> remote: Compressing objects: 100% (5/5), done.
+> remote: Total 11 (delta 0), reused 0 (delta 0)
+> Unpacking objects: 100% (11/11), done.
+> From ../repo_temp
+>  * [new branch]      master     -> rem_repo_temp/master
+
+repo_all$ git merge --allow-unrelated-histories rem_repo_temp/master 
+> Merge made by the 'recursive' strategy.
+>  repo_1/.gitignore | 2 ++
+>  repo_1/file01.txt | 3 +++
+>  2 files changed, 5 insertions(+)
+>  create mode 100644 repo_1/.gitignore
+>  create mode 100644 repo_1/file01.txt
+```
+
+リモート接続を解除する
+```
+repo_all$ git remote remove rem_repo_temp
+```
+
+作業用リポジトリからファイルが取り込まれた状況を確認する
+```
+repo_all$ git branch -a
+> * master
+
+repo_all$ git ls-files
+> .gitignore
+> dir_1/.gitignore
+> dir_1/file01.txt
+
+repo_all$ git log --oneline --graph
+> *   2bbf2f2 (HEAD -> master) Merge remote-tracking branch 'rem_repo_temp/master'
+> |\  
+> | * f409b56 2nd edit file01.txt (repo_1)
+> | * 6514ca3 new file01.txt (repo_1)
+> | * 4cd1f1a first commit (repo_1)
+> * 95e44eb first commit, add .gitignore (repo_all)
+```
+
+取り込んだリポジトリのファイル履歴が追跡可能なのか確認する
+```
+repo_all$ git log --oneline dir_1/file01.txt
+> f409b56 2nd edit file01.txt (repo_1)
+> 6514ca3 new file01.txt (repo_1)
+```
+
+ファイル履歴が追跡可能な状態で、ディレクトリ内に外部リポジトリをまるごとコピーしてくることが出来た。
+
+***（参考）不要なブランチが作成された場合の削除方法***
+
+```git log --oneline```でリポジトリ全体のログを表示したとき、```HEAD -> master```以外に```refs/original/refs/heads/master```という不要なブランチが表示されることがある。
+
+このブランチをログを残さずきれいに削除するには
+```
+$ git update-ref -d refs/original/refs/heads/master
 ```
